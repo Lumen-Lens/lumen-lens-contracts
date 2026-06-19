@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "sample-counter",
+    "sample-token",
+]
+resolver = "2"
+
+[workspace.dependencies]
+soroban-sdk = "21.0.0"
