@@ -1,7 +1,7 @@
 //! Sample SEP-41 Token Contract — used as a richer fixture for Lumen Lens SDK generation.
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, String};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, String};
 
 #[contracttype]
 pub enum DataKey {
