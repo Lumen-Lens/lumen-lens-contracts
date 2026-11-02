@@ -15,6 +15,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
 
       - name: Cache Cargo registry
         uses: actions/cache@v4
@@ -25,14 +26,28 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Build WASMs
-        run: cargo build --release --target wasm32-unknown-unknown
+      - name: Check formatting
+        run: cargo fmt --all -- --check
 
       - name: Run tests
-        run: cargo test
+        run: cargo test --workspace --locked
+
+      - name: Lint contracts and tests
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      - name: Build WASMs
+        run: cargo build --workspace --release --target wasm32-unknown-unknown --locked
+
+      - name: Checksum fixtures
+        working-directory: target/wasm32-unknown-unknown/release
+        run: sha256sum sample_counter.wasm sample_token.wasm > SHA256SUMS
 
       - name: Upload WASMs
         uses: actions/upload-artifact@v4
         with:
           name: contract-wasms
-          path: target/wasm32-unknown-unknown/release/*.wasm
+          if-no-files-found: error
+          path: |
+            target/wasm32-unknown-unknown/release/sample_counter.wasm
+            target/wasm32-unknown-unknown/release/sample_token.wasm
+            target/wasm32-unknown-unknown/release/SHA256SUMS
